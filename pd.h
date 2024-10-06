@@ -21,8 +21,8 @@ typedef struct indexQueue {
 
 typedef struct hashNode {
 	// struct hashNode *hash;
-	indexQueue *indices;
-	char *word;
+	indexQueue indices;
+	char word[32];
 	struct hashNode *next;
 }hashNode;
 

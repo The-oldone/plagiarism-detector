@@ -32,8 +32,9 @@ int main(int argc, char *argv[]) {
 	initQueue(&q2);
 	initHashArray(hashTable);
 	readFile(&q1, f1, hashTable);
-	/*readFileWithoutHashing(&q2, f2);
-	checkPlagiarism(&q1, &q2, &hashTable);*/
+	readFileWithoutHashing(&q2, f2);
+	/*checkPlagiarism(&q1, &q2, &hashTable);*/
+	/*function to free the whole hashTable, queue2, indexqueue, will be implemented if time permits*/
 	fclose(f1);
 	fclose(f2);
 	return 0;

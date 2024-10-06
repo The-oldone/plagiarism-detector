@@ -43,7 +43,7 @@ void indexPush(indexQueue *indexQueue, int index) {
 	return;
 }
 
-/*indexQueue *hashSearch(hashTableHead *hashTable, char *word) {
+indexQueue *hashSearch(hashTableHead *hashTable, char *word) {
 	int hashValue;
 	hashValue = generateHash (word);
 	hashTableHead *nodeSearcher;
@@ -53,7 +53,7 @@ void indexPush(indexQueue *indexQueue, int index) {
 		}
 	}
 	return NULL;
-}*/
+}
 
 void initHashArray(hashTableHead *hashArray) {
 	int i;
@@ -70,20 +70,15 @@ void hashInsert(hashTableHead *hashTable, char *word, int index) {
 	if(hashTable[hashValue].head != NULL){
 		for(sampleNode = hashTable[hashValue].head; sampleNode -> next != NULL; sampleNode = sampleNode -> next) {
 			if(!strcmp(sampleNode -> word, word)) {
-				indexPush(sampleNode -> indices, index);
+				indexPush(&(sampleNode -> indices), index);
 				return;
 			}
 		}
 	}
-	testNode = (hashNode *) malloc(sizeof(hashNode));
-	if(!testNode) {
-		printf("memory full\n");
-	}
-	free(testNode);
 	newNode = (hashNode *) malloc (sizeof(hashNode));
 	strcpy(newNode -> word, word);
 	newNode -> next = NULL;
-	initIndices(newNode -> indices);
+	initIndices(&(newNode -> indices));
 	if(!hashTable[hashValue].head) {
 		hashTable[hashValue].head = newNode;
 		return;
@@ -151,7 +146,7 @@ void readFileWithoutHashing(queue *queue, FILE *file) {
 	while(!feof(file)){
 		fscanf(file, "%s", word);
 		/*just in case the word is larger than 32 characs*/
-		word[WORDSIZE] = '\0';
+		word[WORDSIZE - 1] = '\0';
 		brokenWord = strtok(word, ",./?'\"!");
 		do {
 			if(strlen(brokenWord) < 4){
@@ -195,7 +190,7 @@ int traverseTillDissimilar(queue *file1, queue *file2, int index) {
 
 }
 
-/*int checkPlagiarism(queue *file1, queue *file2, hashTableHead *hashtable) {
+int checkPlagiarism(queue *file1, queue *file2, hashTableHead *hashtable) {
 	char *word;
 	indexNode *indicesCounter;
 	int index, count, max = 0;
@@ -213,4 +208,4 @@ int traverseTillDissimilar(queue *file1, queue *file2, int index) {
 		free(word);
 	}
 	return max;
-}*/
+}
