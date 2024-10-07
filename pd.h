@@ -35,10 +35,10 @@ int checkCommon(char *word);
 void initQueue(queue *q);
 indexQueue *hashTableSearch(hashTableHead *h, char *word);
 void hashTableInsert(hashTableHead *h, char *word, int index);
-void readFile(queue *q, FILE *file, hashTableHead *hashTable);
+void readFile(queue *q, FILE *file, hashTableHead *hashTable, int *fileSize);
 void readFileWithoutHashing(queue *q, FILE *file);
 char *dequeue(queue *q);
-int checkPlagiarism(queue *, queue *, hashTableHead *);
+float checkPlagiarism(queue *, queue *, hashTableHead *, int);
 int isEmpty(queue *);
 int traverseTillDissimilar(queue *, queue *, int index);/*to be done*/
 void initIndices(indexQueue *indices);

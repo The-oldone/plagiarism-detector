@@ -120,9 +120,9 @@ int checkCommon(char *word) {
 	return 0;
 }
 
-void readFile(queue *queue, FILE *file, hashTableHead *hashTable) {
+void readFile(queue *queue, FILE *file, hashTableHead *hashTable, int *fileSize) {
 	char word[WORDSIZE], *brokenWord;
-	int currentIndex = 0;
+	*fileSize = 0;
 	while(!feof(file)){
 		fscanf(file, "%s", word);
 		/*just in case the word is larger than 32 characs*/
@@ -136,8 +136,8 @@ void readFile(queue *queue, FILE *file, hashTableHead *hashTable) {
 			}
 			lowerWord(brokenWord);
 			enqueue(queue, brokenWord);
-			hashTableInsert(hashTable, brokenWord, currentIndex);
-			currentIndex++;
+			hashTableInsert(hashTable, brokenWord, *fileSize);
+			(*fileSize)++;
 		}while((brokenWord = strtok(NULL, ",./?\t'*\\\"!\n")));
 	}
 	return;
@@ -210,9 +210,10 @@ int traverseTillDissimilar(queue *file1, queue *file2, int destinationIndex) {
 	return count;
 }
 
-int checkPlagiarism(queue *file1, queue *file2, hashTableHead *hashtable) {
+float checkPlagiarism(queue *file1, queue *file2, hashTableHead *hashtable, int firstFileSize) {
 	char *word;
 	indexNode *indicesCounter;
+	float plagiarismExtent;
 	int index, count, max = 0;
 	while(!isEmpty(file2)){
 		word = dequeue(file2);
@@ -230,5 +231,6 @@ int checkPlagiarism(queue *file1, queue *file2, hashTableHead *hashtable) {
 		}
 		free(word);
 	}
-	return max;
+	plagiarismExtent = (float) max / firstFileSize;
+	return plagiarismExtent;
 }

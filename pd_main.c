@@ -20,7 +20,8 @@
 int main(int argc, char *argv[]) {
 	queue q1, q2;
 	FILE *f1 = fopen(argv[1], "r"), *f2 = fopen(argv[2], "r");
-	int i, plagiarismValue = 0;
+	int i, firstFileSize;
+	float plagiarismValue = 0.0, plagiarismPercentage;
 	hashTableHead hashTable[HASHSIZE];
 	hashNode *testNode;
 	indexNode *testindex;
@@ -34,7 +35,7 @@ int main(int argc, char *argv[]) {
 	initQueue(&q1);
 	initQueue(&q2);
 	initHashArray(hashTable);
-	readFile(&q1, f1, hashTable);
+	readFile(&q1, f1, hashTable, &firstFileSize);
 	readFileWithoutHashing(&q2, f2);
 	// hash table test block
 	/*for(i = 0; i < HASHSIZE; i++){
@@ -46,9 +47,13 @@ int main(int argc, char *argv[]) {
 			printf("\n");
 		}
 	}*/
-	plagiarismValue = checkPlagiarism(&q1, &q2, hashTable);
-	printf("%d\n", plagiarismValue);
+	plagiarismValue = checkPlagiarism(&q1, &q2, hashTable, firstFileSize);
+	plagiarismPercentage = plagiarismValue * 100;
+	printf("%f%%\n", plagiarismPercentage);
 	/*function to free the whole hashTable, queue2, indexqueue, will be implemented if time permits*/
+	/*freeHashTable(hashTable);
+	freeQueue(q1);
+	freeQueue(q2);*/
 	fclose(f1);
 	fclose(f2);
 	return 0;
