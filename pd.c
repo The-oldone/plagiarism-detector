@@ -13,7 +13,7 @@ void initIndices(indexQueue *indices) {
 	return;
 }
 
-int generateHash(char *word) {
+int generateHashValue(char *word) {
 	unsigned hashValue = 0;
 	while(*word) {
 		hashValue = *word + hashValue;
@@ -44,9 +44,9 @@ void indexPush(indexQueue *indexQueue, int index) {
 	return;
 }
 
-indexQueue *hashSearch(hashTableHead *hashTable, char *word) {
+indexQueue *hashTableSearch(hashTableHead *hashTable, char *word) {
 	int hashValue;
-	hashValue = generateHash (word);
+	hashValue = generateHashValue (word);
 	hashNode *nodeSearcher;
 	for(nodeSearcher = hashTable[hashValue].head; nodeSearcher; nodeSearcher = nodeSearcher -> next) {
 		if(!strcmp(nodeSearcher -> word, word)) {
@@ -64,10 +64,10 @@ void initHashArray(hashTableHead *hashArray) {
 	return;
 }
 
-void hashInsert(hashTableHead *hashTable, char *word, int index) {
+void hashTableInsert(hashTableHead *hashTable, char *word, int index) {
 	int hashValue;
 	hashNode *sampleNode, *newNode, *nodeBehindSampleNode;
-	hashValue = generateHash(word);
+	hashValue = generateHashValue(word);
 	if(hashTable[hashValue].head != NULL){
 		for(sampleNode = hashTable[hashValue].head; sampleNode != NULL; sampleNode = sampleNode -> next) {
 			nodeBehindSampleNode = sampleNode;
@@ -136,7 +136,7 @@ void readFile(queue *queue, FILE *file, hashTableHead *hashTable) {
 			}
 			lowerWord(brokenWord);
 			enqueue(queue, brokenWord);
-			hashInsert(hashTable, brokenWord, currentIndex);
+			hashTableInsert(hashTable, brokenWord, currentIndex);
 			currentIndex++;
 		}while((brokenWord = strtok(NULL, ",./?\t'*\\\"!\n")));
 	}
@@ -216,10 +216,10 @@ int checkPlagiarism(queue *file1, queue *file2, hashTableHead *hashtable) {
 	int index, count, max = 0;
 	while(!isEmpty(file2)){
 		word = dequeue(file2);
-		if(!hashSearch(hashtable, word)) {
+		if(!hashTableSearch(hashtable, word)) {
 			continue;
 		}
-		indicesCounter = hashSearch(hashtable, word) -> head;
+		indicesCounter = hashTableSearch(hashtable, word) -> head;
 		while(indicesCounter) {
 			index = indicesCounter -> index;
 			count = traverseTillDissimilar(file1, file2, index + 1);

@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
 	readFile(&q1, f1, hashTable);
 	readFileWithoutHashing(&q2, f2);
 	// hash table test block
-	for(i = 0; i < HASHSIZE; i++){
+	/*for(i = 0; i < HASHSIZE; i++){
 		for(testNode = hashTable[i].head; testNode; testNode = testNode -> next){
 			printf("%s ", testNode -> word);
 			for(testindex = testNode->indices.head; testindex; testindex = testindex -> next) {
@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
 			}
 			printf("\n");
 		}
-	}
+	}*/
 	plagiarismValue = checkPlagiarism(&q1, &q2, hashTable);
 	printf("%d\n", plagiarismValue);
 	/*function to free the whole hashTable, queue2, indexqueue, will be implemented if time permits*/

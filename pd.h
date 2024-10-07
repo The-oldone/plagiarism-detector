@@ -33,8 +33,8 @@ typedef struct hashTableHead{
 void enqueue(queue *q, char *word);
 int checkCommon(char *word);
 void initQueue(queue *q);
-indexQueue *hashSearch(hashTableHead *h, char *word);
-void hashInsert(hashTableHead *h, char *word, int index);
+indexQueue *hashTableSearch(hashTableHead *h, char *word);
+void hashTableInsert(hashTableHead *h, char *word, int index);
 void readFile(queue *q, FILE *file, hashTableHead *hashTable);
 void readFileWithoutHashing(queue *q, FILE *file);
 char *dequeue(queue *q);
@@ -42,7 +42,7 @@ int checkPlagiarism(queue *, queue *, hashTableHead *);
 int isEmpty(queue *);
 int traverseTillDissimilar(queue *, queue *, int index);/*to be done*/
 void initIndices(indexQueue *indices);
-int generateHash(char *word);
+int generateHashValue(char *word);
 void indexPush(indexQueue *, int);
 void lowerWord(char *);
 void initHashArray(hashTableHead *hashArray);
