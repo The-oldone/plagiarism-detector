@@ -20,7 +20,10 @@
 int main(int argc, char *argv[]) {
 	queue q1, q2;
 	FILE *f1 = fopen(argv[1], "r"), *f2 = fopen(argv[2], "r");
+	int i, plagiarismValue = 0;
 	hashTableHead hashTable[HASHSIZE];
+	hashNode *testNode;
+	indexNode *testindex;
 	if(!f1) {
 		printf("first file doesn't exist\n");
 		return 1;
@@ -33,7 +36,18 @@ int main(int argc, char *argv[]) {
 	initHashArray(hashTable);
 	readFile(&q1, f1, hashTable);
 	readFileWithoutHashing(&q2, f2);
-	/*checkPlagiarism(&q1, &q2, &hashTable);*/
+	// hash table test block
+	for(i = 0; i < HASHSIZE; i++){
+		for(testNode = hashTable[i].head; testNode; testNode = testNode -> next){
+			printf("%s ", testNode -> word);
+			for(testindex = testNode->indices.head; testindex; testindex = testindex -> next) {
+				printf("%d ", testindex -> index);
+			}
+			printf("\n");
+		}
+	}
+	plagiarismValue = checkPlagiarism(&q1, &q2, hashTable);
+	printf("%d\n", plagiarismValue);
 	/*function to free the whole hashTable, queue2, indexqueue, will be implemented if time permits*/
 	fclose(f1);
 	fclose(f2);

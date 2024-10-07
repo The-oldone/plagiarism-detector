@@ -40,16 +40,17 @@ void indexPush(indexQueue *indexQueue, int index) {
 		return;
 	}
 	indexQueue -> end -> next = newNode;
+	indexQueue -> end = newNode;
 	return;
 }
 
 indexQueue *hashSearch(hashTableHead *hashTable, char *word) {
 	int hashValue;
 	hashValue = generateHash (word);
-	hashTableHead *nodeSearcher;
-	for(nodeSearcher = &hashTable[hashValue]; nodeSearcher; nodeSearcher = nodeSearcher -> next) {
-		if(!strcmp(nodeSearcher ->word, word)) {
-			return nodeSearcher ->indices;
+	hashNode *nodeSearcher;
+	for(nodeSearcher = hashTable[hashValue].head; nodeSearcher; nodeSearcher = nodeSearcher -> next) {
+		if(!strcmp(nodeSearcher -> word, word)) {
+			return &(nodeSearcher -> indices);
 		}
 	}
 	return NULL;
@@ -65,10 +66,11 @@ void initHashArray(hashTableHead *hashArray) {
 
 void hashInsert(hashTableHead *hashTable, char *word, int index) {
 	int hashValue;
-	hashNode *sampleNode, *newNode, *testNode;
+	hashNode *sampleNode, *newNode, *nodeBehindSampleNode;
 	hashValue = generateHash(word);
 	if(hashTable[hashValue].head != NULL){
-		for(sampleNode = hashTable[hashValue].head; sampleNode -> next != NULL; sampleNode = sampleNode -> next) {
+		for(sampleNode = hashTable[hashValue].head; sampleNode != NULL; sampleNode = sampleNode -> next) {
+			nodeBehindSampleNode = sampleNode;
 			if(!strcmp(sampleNode -> word, word)) {
 				indexPush(&(sampleNode -> indices), index);
 				return;
@@ -79,11 +81,12 @@ void hashInsert(hashTableHead *hashTable, char *word, int index) {
 	strcpy(newNode -> word, word);
 	newNode -> next = NULL;
 	initIndices(&(newNode -> indices));
+	indexPush(&(newNode -> indices), index);
 	if(!hashTable[hashValue].head) {
 		hashTable[hashValue].head = newNode;
 		return;
 	}
-	sampleNode -> next = newNode;
+	nodeBehindSampleNode -> next = newNode;
 	return;
 }
 
@@ -124,7 +127,7 @@ void readFile(queue *queue, FILE *file, hashTableHead *hashTable) {
 		fscanf(file, "%s", word);
 		/*just in case the word is larger than 32 characs*/
 		word[WORDSIZE - 1] = '\0';
-		brokenWord = strtok(word, ",./?'\"!");
+		brokenWord = strtok(word, ",./?\t'*\\\"!\n");
 		do {
 			if(strlen(brokenWord) < 4){
 				if(checkCommon(brokenWord)) {
@@ -135,7 +138,7 @@ void readFile(queue *queue, FILE *file, hashTableHead *hashTable) {
 			enqueue(queue, brokenWord);
 			hashInsert(hashTable, brokenWord, currentIndex);
 			currentIndex++;
-		}while((brokenWord = strtok(NULL, ",./?'\"!")));
+		}while((brokenWord = strtok(NULL, ",./?\t'*\\\"!\n")));
 	}
 	return;
 }
@@ -147,7 +150,7 @@ void readFileWithoutHashing(queue *queue, FILE *file) {
 		fscanf(file, "%s", word);
 		/*just in case the word is larger than 32 characs*/
 		word[WORDSIZE - 1] = '\0';
-		brokenWord = strtok(word, ",./?'\"!");
+		brokenWord = strtok(word, ",./?\t'*\\\"!\n");
 		do {
 			if(strlen(brokenWord) < 4){
 				if(checkCommon(brokenWord)) {
@@ -157,7 +160,7 @@ void readFileWithoutHashing(queue *queue, FILE *file) {
 			lowerWord(brokenWord);
 			enqueue(queue, brokenWord);
 			currentIndex++;
-		}while((brokenWord = strtok(NULL, ",./?'\"!")));
+		}while((brokenWord = strtok(NULL, ",./?\t'*\\\"!\n")));
 	}
 	return;
 }
@@ -186,20 +189,40 @@ char *dequeue(queue *queue) {
 	return wordToBeReturned;
 }
 
-int traverseTillDissimilar(queue *file1, queue *file2, int index) {
-
+int traverseTillDissimilar(queue *file1, queue *file2, int destinationIndex) {
+	wordNode *wordFromFile1, *wordFromFile2;
+	int i;
+	int count = 1;
+	wordFromFile1 = file1 -> head;
+	wordFromFile2 = file2 -> head;
+	for(i = 0; i < destinationIndex; i++) {
+		wordFromFile1 = wordFromFile1 -> next;
+		if(!wordFromFile1) {
+			return 0;
+		}
+	}
+	for(; wordFromFile1 && wordFromFile2; wordFromFile1 = wordFromFile1 -> next, wordFromFile2 = wordFromFile2 -> next) {
+		if(strcmp(wordFromFile1 -> word, wordFromFile2 -> word)) {
+			break;
+		}
+		count++;
+	}
+	return count;
 }
 
 int checkPlagiarism(queue *file1, queue *file2, hashTableHead *hashtable) {
 	char *word;
 	indexNode *indicesCounter;
 	int index, count, max = 0;
-	while(!isEmpty(file1)){
-		word = dequeue(file1);
+	while(!isEmpty(file2)){
+		word = dequeue(file2);
+		if(!hashSearch(hashtable, word)) {
+			continue;
+		}
 		indicesCounter = hashSearch(hashtable, word) -> head;
 		while(indicesCounter) {
 			index = indicesCounter -> index;
-			count = traverseTillDissimilar(file1, file2, index);
+			count = traverseTillDissimilar(file1, file2, index + 1);
 			if(count > max) {
 				max = count;
 			}
