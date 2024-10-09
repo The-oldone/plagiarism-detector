@@ -35,8 +35,8 @@ int main(int argc, char *argv[]) {
 	initQueue(&q1);
 	initQueue(&q2);
 	initHashArray(hashTable);
-	readFile(&q1, f1, hashTable, &firstFileSize);
-	readFileWithoutHashing(&q2, f2);
+	readFile(&q1, f1, hashTable, &firstFileSize, 1);
+	readFile(&q2, f2, hashTable, &firstFileSize, 0);
 	// hash table test block
 	/*for(i = 0; i < HASHSIZE; i++){
 		for(testNode = hashTable[i].head; testNode; testNode = testNode -> next){

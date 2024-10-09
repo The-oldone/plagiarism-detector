@@ -128,9 +128,10 @@ char *tokenizeWord(char *word, int firstTimeFlag) {
 	}
 }
 
-void readFile(queue *queue, FILE *file, hashTableHead *hashTable, int *fileSize) {
+void readFile(queue *queue, FILE *file, hashTableHead *hashTable, int *fileSize, int firstFile) {
 	char word[WORDSIZE], *brokenWord;
-	*fileSize = 0;
+	if(firstFile)
+		*fileSize = 0;
 	while(!feof(file)){
 		fscanf(file, "%s", word);
 		/*just in case the word is larger than 32 characs*/
@@ -144,30 +145,10 @@ void readFile(queue *queue, FILE *file, hashTableHead *hashTable, int *fileSize)
 			}
 			lowerWord(brokenWord);
 			enqueue(queue, brokenWord);
-			hashTableInsert(hashTable, brokenWord, *fileSize);
-			(*fileSize)++;
-		}while((brokenWord = tokenizeWord(word, 0)));
-	}
-	return;
-}
-
-void readFileWithoutHashing(queue *queue, FILE *file) {
-	char word[WORDSIZE], *brokenWord;
-	int currentIndex = 0;
-	while(!feof(file)){
-		fscanf(file, "%s", word);
-		/*just in case the word is larger than 32 characs*/
-		word[WORDSIZE - 1] = '\0';
-		brokenWord = tokenizeWord(word, 1);
-		do {
-			if(strlen(brokenWord) < 4){
-				if(checkCommon(brokenWord)) {
-					continue;
-				}
+			if(firstFile) {
+				hashTableInsert(hashTable, brokenWord, *fileSize);
+				(*fileSize)++;
 			}
-			lowerWord(brokenWord);
-			enqueue(queue, brokenWord);
-			currentIndex++;
 		}while((brokenWord = tokenizeWord(word, 0)));
 	}
 	return;
