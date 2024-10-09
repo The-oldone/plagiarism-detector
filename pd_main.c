@@ -20,11 +20,11 @@
 int main(int argc, char *argv[]) {
 	queue q1, q2;
 	FILE *f1 = fopen(argv[1], "r"), *f2 = fopen(argv[2], "r");
-	int i, firstFileSize;
+	int /*i, */firstFileSize;
 	float plagiarismValue = 0.0, plagiarismPercentage;
 	hashTableHead hashTable[HASHSIZE];
-	hashNode *testNode;
-	indexNode *testindex;
+	// hashNode *testNode;
+	// indexNode *testindex;
 	if(!f1) {
 		printf("first file doesn't exist\n");
 		return 1;

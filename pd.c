@@ -120,6 +120,14 @@ int checkCommon(char *word) {
 	return 0;
 }
 
+char *tokenizeWord(char *word, int firstTimeFlag) {
+	if(firstTimeFlag) {
+		return strtok(word, ",./?\t'*\\\"!\n");
+	} else {
+		return strtok(NULL, ",./?\t'*\\\"!\n");
+	}
+}
+
 void readFile(queue *queue, FILE *file, hashTableHead *hashTable, int *fileSize) {
 	char word[WORDSIZE], *brokenWord;
 	*fileSize = 0;
@@ -127,7 +135,7 @@ void readFile(queue *queue, FILE *file, hashTableHead *hashTable, int *fileSize)
 		fscanf(file, "%s", word);
 		/*just in case the word is larger than 32 characs*/
 		word[WORDSIZE - 1] = '\0';
-		brokenWord = strtok(word, ",./?\t'*\\\"!\n");
+		brokenWord = tokenizeWord(word, 1);
 		do {
 			if(strlen(brokenWord) < 4){
 				if(checkCommon(brokenWord)) {
@@ -138,7 +146,7 @@ void readFile(queue *queue, FILE *file, hashTableHead *hashTable, int *fileSize)
 			enqueue(queue, brokenWord);
 			hashTableInsert(hashTable, brokenWord, *fileSize);
 			(*fileSize)++;
-		}while((brokenWord = strtok(NULL, ",./?\t'*\\\"!\n")));
+		}while((brokenWord = tokenizeWord(word, 0)));
 	}
 	return;
 }
@@ -150,7 +158,7 @@ void readFileWithoutHashing(queue *queue, FILE *file) {
 		fscanf(file, "%s", word);
 		/*just in case the word is larger than 32 characs*/
 		word[WORDSIZE - 1] = '\0';
-		brokenWord = strtok(word, ",./?\t'*\\\"!\n");
+		brokenWord = tokenizeWord(word, 1);
 		do {
 			if(strlen(brokenWord) < 4){
 				if(checkCommon(brokenWord)) {
@@ -160,7 +168,7 @@ void readFileWithoutHashing(queue *queue, FILE *file) {
 			lowerWord(brokenWord);
 			enqueue(queue, brokenWord);
 			currentIndex++;
-		}while((brokenWord = strtok(NULL, ",./?\t'*\\\"!\n")));
+		}while((brokenWord = tokenizeWord(word, 0)));
 	}
 	return;
 }

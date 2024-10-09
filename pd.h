@@ -46,3 +46,4 @@ int generateHashValue(char *word);
 void indexPush(indexQueue *, int);
 void lowerWord(char *);
 void initHashArray(hashTableHead *hashArray);
+char *tokenizeWord(char *, int);
