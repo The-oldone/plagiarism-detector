@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
 	}*/
 	plagiarismValue = checkPlagiarism(&q1, &q2, hashTable, firstFileSize);
 	plagiarismPercentage = plagiarismValue * 100;
-	printf("%f%%\n", plagiarismPercentage);
+	printf("%.2f%%\n", plagiarismPercentage);
 	/*function to free the whole hashTable, queue2, indexqueue, will be implemented if time permits*/
 	/*freeHashTable(hashTable);
 	freeQueue(q1);
