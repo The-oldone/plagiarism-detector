@@ -90,14 +90,14 @@ void hashTableInsert(hashTableHead *hashTable, char *word, int index) {
 	return;
 }
 
-int isEmpty(queue *queue) {
+int isEmpty(wordQueue *queue) {
 	if(queue -> head) {
 		return 0;
 	}
 	return 1;
 }
 
-void enqueue(queue *queue, char *word) {
+void enqueue(wordQueue *queue, char *word) {
 	wordNode *newNode;
 	newNode = (wordNode *) malloc (sizeof(wordNode));
 	newNode -> next = NULL;
@@ -128,7 +128,7 @@ char *tokenizeWord(char *word, int firstTimeFlag) {
 	}
 }
 
-void readFile(queue *queue, FILE *file, hashTableHead *hashTable, int *fileSize, int firstFile) {
+void readFile(wordQueue *queue, FILE *file, hashTableHead *hashTable, int *fileSize, int firstFile) {
 	char word[WORDSIZE], *brokenWord;
 	if(firstFile)
 		*fileSize = 0;
@@ -154,12 +154,12 @@ void readFile(queue *queue, FILE *file, hashTableHead *hashTable, int *fileSize,
 	return;
 }
 
-void initQueue(queue *queue) {
+void initQueue(wordQueue *queue) {
 	queue -> head = queue -> rear = NULL;
 	return;
 }
 
-char *dequeue(queue *queue) {
+char *dequeue(wordQueue *queue) {
 	char *wordToBeReturned = (char *) malloc (sizeof(char) * WORDSIZE);
 	wordNode *toBeFreed;
 	if(!queue -> head) {
@@ -178,7 +178,7 @@ char *dequeue(queue *queue) {
 	return wordToBeReturned;
 }
 
-int traverseTillDissimilar(queue *file1, queue *file2, int destinationIndex) {
+int traverseTillDissimilar(wordQueue *file1, wordQueue *file2, int destinationIndex) {
 	wordNode *wordFromFile1, *wordFromFile2;
 	int i;
 	int count = 1;
@@ -199,7 +199,7 @@ int traverseTillDissimilar(queue *file1, queue *file2, int destinationIndex) {
 	return count;
 }
 
-float checkPlagiarism(queue *file1, queue *file2, hashTableHead *hashtable, int firstFileSize) {
+float checkPlagiarism(wordQueue *file1, wordQueue *file2, hashTableHead *hashtable, int firstFileSize) {
 	char *word;
 	indexNode *indicesCounter;
 	float plagiarismExtent;
@@ -222,4 +222,48 @@ float checkPlagiarism(queue *file1, queue *file2, hashTableHead *hashtable, int 
 	}
 	plagiarismExtent = (float) max / firstFileSize;
 	return plagiarismExtent;
+}
+
+/*a linked list of wordnodes which has to be freed*/
+void freeQueue(wordQueue *wordQueue) {
+	wordNode *toBeFreed, *currentNode;
+	toBeFreed = currentNode = wordQueue -> head;
+	while(currentNode) {
+		toBeFreed = currentNode;
+		currentNode = currentNode -> next;
+		free(toBeFreed);
+	}
+	wordQueue -> head = NULL;
+	wordQueue -> rear = NULL;
+	return;
+}
+
+/*a linked list of hashNodes each of which contains a linked list of indexNodes which has to be freed*/
+void freeHashTable(hashTableHead *hashTable) {
+	hashNode *toBeFreed, *currentNode;
+	int i;
+	for (i = 0; i < HASHSIZE; i++) {
+		toBeFreed = currentNode = hashTable -> head;
+		while(currentNode) {
+			toBeFreed = currentNode;
+			currentNode = currentNode -> next;
+			freeIndices(&(toBeFreed -> indices));
+			free(toBeFreed);
+		}
+		hashTable -> head = NULL;
+		hashTable++;
+	}
+	return;
+}
+
+void freeIndices(indexQueue *indexQueue) {
+	indexNode *toBeFreed, *currentNode;
+	toBeFreed = currentNode = indexQueue -> head;
+	while(currentNode) {
+		toBeFreed = currentNode;
+		currentNode = currentNode -> next;
+		free(toBeFreed);
+	}
+	indexQueue -> head = NULL;
+	return;
 }

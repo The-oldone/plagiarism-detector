@@ -4,10 +4,10 @@ typedef struct wordNode{
 	char word[32];
 }wordNode;
 
-typedef struct queue{
+typedef struct wordQueue {
 	wordNode *head;
 	wordNode *rear;
-}queue;
+}wordQueue;
 
 typedef struct indexNode {
 	int index;
@@ -20,7 +20,6 @@ typedef struct indexQueue {
 }indexQueue;
 
 typedef struct hashNode {
-	// struct hashNode *hash;
 	indexQueue indices;
 	char word[32];
 	struct hashNode *next;
@@ -30,19 +29,22 @@ typedef struct hashTableHead{
 	hashNode *head;
 }hashTableHead;
 
-void enqueue(queue *q, char *word);
+void enqueue(wordQueue *q, char *word);
 int checkCommon(char *word);
-void initQueue(queue *q);
+void initQueue(wordQueue *q);
 indexQueue *hashTableSearch(hashTableHead *h, char *word);
 void hashTableInsert(hashTableHead *h, char *word, int index);
-void readFile(queue *q, FILE *file, hashTableHead *hashTable, int *fileSize, int);
-char *dequeue(queue *q);
-float checkPlagiarism(queue *, queue *, hashTableHead *, int);
-int isEmpty(queue *);
-int traverseTillDissimilar(queue *, queue *, int index);/*to be done*/
+void readFile(wordQueue *q, FILE *file, hashTableHead *hashTable, int *fileSize, int);
+char *dequeue(wordQueue *q);
+float checkPlagiarism(wordQueue *, wordQueue *, hashTableHead *, int);
+int isEmpty(wordQueue *);
+int traverseTillDissimilar(wordQueue *, wordQueue *, int index);/*to be done*/
 void initIndices(indexQueue *indices);
 int generateHashValue(char *word);
 void indexPush(indexQueue *, int);
 void lowerWord(char *);
 void initHashArray(hashTableHead *hashArray);
 char *tokenizeWord(char *, int);
+void freeHashTable(hashTableHead *);
+void freeQueue(wordQueue *);
+void freeIndices(indexQueue *);
