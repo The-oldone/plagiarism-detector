@@ -3,3 +3,7 @@
 *.pdb
 *.obj
 .vscode
+test.c
+test
+a.out
+gui
