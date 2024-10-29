@@ -48,3 +48,4 @@ char *tokenizeWord(char *, int);
 void freeHashTable(hashTableHead *);
 void freeQueue(wordQueue *);
 void freeIndices(indexQueue *);
+void pd_main(char **);

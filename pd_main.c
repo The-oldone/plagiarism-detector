@@ -12,9 +12,9 @@
  * providing sufficient gains.
  */
 
-int main(int argc, char *argv[]) {
+void pd_main(char *argv[]) {
 	wordQueue q1, q2;
-	FILE *f1 = fopen(argv[1], "r"), *f2 = fopen(argv[2], "r");
+	FILE *f1 = fopen(argv[0], "r"), *f2 = fopen(argv[1], "r");
 	int /*i, */firstFileSize;
 	float plagiarismValue = 0.0, plagiarismPercentage;
 	hashTableHead hashTable[HASHSIZE];
@@ -22,10 +22,10 @@ int main(int argc, char *argv[]) {
 	// indexNode *testindex;
 	if(!f1) {
 		printf("first file doesn't exist\n");
-		return 1;
+		return;
 	} else if(!f2) {
 		printf("second file doesn't exist\n");
-		return 1;
+		return;
 	}
 	initQueue(&q1);
 	initQueue(&q2);
@@ -58,7 +58,5 @@ int main(int argc, char *argv[]) {
 			printf("\n");
 		}
 	}*/
-	fclose(f1);
-	fclose(f2);
-	return 0;
+	return;
 }
