@@ -12,7 +12,7 @@
  * providing sufficient gains.
  */
 
-void pd_main(char *argv[]) {
+float pd_main(char *argv[]) {
 	wordQueue q1, q2;
 	FILE *f1 = fopen(argv[0], "r"), *f2 = fopen(argv[1], "r");
 	int /*i, */firstFileSize;
@@ -22,10 +22,10 @@ void pd_main(char *argv[]) {
 	// indexNode *testindex;
 	if(!f1) {
 		printf("first file doesn't exist\n");
-		return;
+		return -1.0;
 	} else if(!f2) {
 		printf("second file doesn't exist\n");
-		return;
+		return -1.0;
 	}
 	initQueue(&q1);
 	initQueue(&q2);
@@ -58,5 +58,7 @@ void pd_main(char *argv[]) {
 			printf("\n");
 		}
 	}*/
-	return;
+	fclose(f1);
+	fclose(f2);
+	return plagiarismPercentage;
 }
