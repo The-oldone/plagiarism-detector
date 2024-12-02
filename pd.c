@@ -5,7 +5,6 @@
 #include<ctype.h>
 
 #define WORDSIZE 32
-#define HASHSIZE 101
 
 void initIndices(indexQueue *indices) {
 	indices -> head = NULL;

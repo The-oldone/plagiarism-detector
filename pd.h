@@ -50,3 +50,5 @@ void freeHashTable(hashTableHead *);
 void freeQueue(wordQueue *);
 void freeIndices(indexQueue *);
 float pd_main_text_file(char **);
+
+#define HASHSIZE 1001

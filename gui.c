@@ -66,7 +66,6 @@ void on_detect_button_clicked(GtkWidget *button, gpointer user_data) {
     file_names[1] = (char *)file2_text;
 
     plagiarism_value_file_1 = pd_main_text_file(file_names);
-    printf("reached\n");
 
     file_names[0] = (char *)file2_text;
     file_names[1] = (char *)file1_text;

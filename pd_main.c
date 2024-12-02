@@ -3,7 +3,6 @@
 #include"pd.h"
 #include<string.h>
 
-#define HASHSIZE 101
 
 /**
  * we can't not store the second file in a queue, because, we scan one word, then to check more words
@@ -60,6 +59,5 @@ float pd_main_text_file(char **argv) {
 	}*/
 	fclose(f1);
 	fclose(f2);
-	printf("reached\n");
 	return plagiarismPercentage;
 }
