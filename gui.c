@@ -3,33 +3,34 @@
 #include"pd.h"
 
 /**make all gtk widgets as local variables and pass a struct
- * merge the 2 delete functions together
- * add function to only display the current file and not the whole path
  * add functionality to display the percentage for both files
  * add functionality to work for docx and pdf files
 */
-GtkWidget *file1_label, *file2_label;
-GtkWidget *file1_button, *file2_button;
-GtkWidget *file1_delete_button, *file2_delete_button;
-GtkWidget *detect_button;
-GtkWidget *plagiarism_value_displayer;
+typedef struct {
+    GtkWidget *file1_label, *file2_label;
+    GtkWidget *file1_button, *file2_button;
+    GtkWidget *file1_delete_button, *file2_delete_button;
+    GtkWidget *detect_button;
+    GtkWidget *plagiarism_value_displayer;
+}widget_data;
 
 // Function to open file dialog
 void on_file_button_clicked(GtkWidget *button, gpointer user_data) {
-    int file_number = GPOINTER_TO_INT(user_data);
-    GtkWidget *dialog = gtk_file_chooser_dialog_new("Select File",
+    GtkWidget *dialog = gtk_file_chooser_dialog_new("Select files to compare",
                                                     NULL,
                                                     GTK_FILE_CHOOSER_ACTION_OPEN,
                                                     "_Cancel", GTK_RESPONSE_CANCEL,
                                                     "_Open", GTK_RESPONSE_ACCEPT,
                                                     NULL);
+    widget_data *widgets = (widget_data *) user_data;
 
     if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
-        char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
-        if (file_number == 1) {
-            gtk_label_set_text(GTK_LABEL(file1_label), filename);
+        char *filepath = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+        char *filename = g_path_get_basename(filepath);
+        if (button == widgets -> file1_button) {
+            gtk_label_set_text(GTK_LABEL(widgets -> file1_label), filename);
         } else {
-            gtk_label_set_text(GTK_LABEL(file2_label), filename);
+            gtk_label_set_text(GTK_LABEL(widgets -> file2_label), filename);
         }
         g_free(filename);
     }
@@ -37,38 +38,46 @@ void on_file_button_clicked(GtkWidget *button, gpointer user_data) {
 }
 
 // Function to delete file 1
-void on_file1_delete_button_clicked(GtkWidget *button) {
-    gtk_label_set_text(GTK_LABEL(file1_label), "No file selected");
-}
-
-// Function to delete file 2
-void on_file2_delete_button_clicked(GtkWidget *button) {
-    gtk_label_set_text(GTK_LABEL(file2_label), "No file selected");
+void on_file_delete_button_clicked(GtkWidget *button, gpointer file_data) {
+    widget_data *widgets = (widget_data *) file_data;
+    if(widgets -> file1_delete_button == button) {
+        gtk_label_set_text(GTK_LABEL(widgets -> file1_label), "No file selected");
+        return;
+    }
+    gtk_label_set_text(GTK_LABEL(widgets -> file2_label), "No file selected");
+    return;
 }
 
 // Function to handle detection logic for files 1 and 2
-void on_detect_button_clicked(GtkWidget *button, gpointer plagiarism_value_holder) {
-    const char *file1_text = gtk_label_get_text(GTK_LABEL(file1_label));
-    const char *file2_text = gtk_label_get_text(GTK_LABEL(file2_label));
+void on_detect_button_clicked(GtkWidget *button, gpointer user_data) {
+    widget_data *widgets = (widget_data *) user_data;
+    const char *file1_text = gtk_label_get_text(GTK_LABEL(widgets -> file1_label));
+    const char *file2_text = gtk_label_get_text(GTK_LABEL(widgets -> file2_label));
     if (g_strcmp0(file1_text, "No file selected") == 0 || g_strcmp0(file2_text, "No file selected") == 0) {
         g_print("Please select both files.\n");
-        gtk_label_set_text(GTK_LABEL(plagiarism_value_displayer), "Please select files in both slots");
+        gtk_label_set_text(GTK_LABEL(widgets -> plagiarism_value_displayer), "Please select files in both slots");
         return;
     }
-    float *plagiarism_value = (float *)plagiarism_value_holder;
-    gchar *plagiarism_value_as_string;
+    float plagiarism_value_file_1, plagiarism_value_file_2;
+    gchar *plagiarism_value_file_1_as_string, *plagiarism_value_file_2_as_string;
 
     char **file_names = (char **) malloc (sizeof(char *) * 2);
     file_names[0] = (char *)file1_text;
     file_names[1] = (char *)file2_text;
 
-    *plagiarism_value = pd_main(file_names);
+    plagiarism_value_file_1 = pd_main_text_file(file_names);
+    printf("reached\n");
 
-    int float_width = snprintf(NULL, 0, "%.2f", *plagiarism_value);
-    plagiarism_value_as_string = (gchar *) malloc (float_width + 1);
-    snprintf(plagiarism_value_as_string, float_width + 1, "%.2f", *plagiarism_value);
+    file_names[0] = (char *)file2_text;
+    file_names[1] = (char *)file1_text;
+
+    plagiarism_value_file_2 = pd_main_text_file(file_names);
+
     free(file_names);
-    gtk_label_set_text(GTK_LABEL(plagiarism_value_displayer), plagiarism_value_as_string);
+    gchar *final_message = (gchar *) malloc(strlen("Plagiarism extent of file 1: 12345%%\nPlagiarism extent of file 2: 12345%%") * sizeof(char));
+    snprintf(final_message, 99, "Plagiarism extent of file 1: %.2f%%\nPlagiarism extent of file 2: %.2f%%", plagiarism_value_file_1, plagiarism_value_file_2);
+    gtk_label_set_text(GTK_LABEL(widgets -> plagiarism_value_displayer), final_message);
+    free(final_message);
     return;
 }
 
@@ -77,6 +86,7 @@ void activate(GtkApplication *app, gpointer user_data) {
     GtkWidget *window;
     GtkWidget *box;
     GtkWidget *grid;
+    widget_data *widgets = (widget_data *) user_data;
 
     window = gtk_application_window_new(app);
     gtk_window_set_title(GTK_WINDOW(window), "Plagiarism Detector");
@@ -100,38 +110,37 @@ void activate(GtkApplication *app, gpointer user_data) {
     gtk_grid_set_column_homogeneous(GTK_GRID(grid), TRUE); // Equal column width
     gtk_container_set_border_width(GTK_CONTAINER(grid), 20);
 
-    file1_button = gtk_button_new_with_label("Select File 1");
-    g_signal_connect(file1_button, "clicked", G_CALLBACK(on_file_button_clicked), GINT_TO_POINTER(1));
-    gtk_grid_attach(GTK_GRID(grid), file1_button, 0, 2, 1, 1);
+    widgets -> file1_button = gtk_button_new_with_label("Select File 1");
+    g_signal_connect(widgets -> file1_button, "clicked", G_CALLBACK(on_file_button_clicked), widgets);
+    gtk_grid_attach(GTK_GRID(grid), widgets -> file1_button, 0, 2, 1, 1);
 
-    file1_label = gtk_label_new("No file selected");
-    gtk_grid_attach(GTK_GRID(grid), file1_label, 1, 2, 1, 1);
+    widgets -> file1_label = gtk_label_new("No file selected");
+    gtk_grid_attach(GTK_GRID(grid), widgets -> file1_label, 1, 2, 1, 1);
 
-    // Delete button for File 1
-    file1_delete_button = gtk_button_new_with_label("Delete File 1");
-    g_signal_connect(file1_delete_button, "clicked", G_CALLBACK(on_file1_delete_button_clicked), NULL);
-    gtk_grid_attach(GTK_GRID(grid), file1_delete_button, 0, 3, 2, 1);
+    widgets -> file1_delete_button = gtk_button_new_with_label("Delete File 1");
+    g_signal_connect(widgets -> file1_delete_button, "clicked", G_CALLBACK(on_file_delete_button_clicked), widgets);
+    gtk_grid_attach(GTK_GRID(grid), widgets -> file1_delete_button, 0, 3, 2, 1);
 
-    file2_button = gtk_button_new_with_label("Select File 2");
-    g_signal_connect(file2_button, "clicked", G_CALLBACK(on_file_button_clicked), GINT_TO_POINTER(2));
-    gtk_grid_attach(GTK_GRID(grid), file2_button, 0, 4, 1, 1);
+    widgets -> file2_button = gtk_button_new_with_label("Select File 2");
+    g_signal_connect(widgets -> file2_button, "clicked", G_CALLBACK(on_file_button_clicked), widgets);
+    gtk_grid_attach(GTK_GRID(grid), widgets -> file2_button, 0, 4, 1, 1);
 
-    file2_label = gtk_label_new("No file selected");
-    gtk_grid_attach(GTK_GRID(grid), file2_label, 1, 4, 1, 1);
+    widgets -> file2_label = gtk_label_new("No file selected");
+    gtk_grid_attach(GTK_GRID(grid), widgets -> file2_label, 1, 4, 1, 1);
 
     // Delete button for File 2
-    file2_delete_button = gtk_button_new_with_label("Delete File 2");
-    g_signal_connect(file2_delete_button, "clicked", G_CALLBACK(on_file2_delete_button_clicked), NULL);
-    gtk_grid_attach(GTK_GRID(grid), file2_delete_button, 0, 5, 2, 1);
+    widgets -> file2_delete_button = gtk_button_new_with_label("Delete File 2");
+    g_signal_connect(widgets -> file2_delete_button, "clicked", G_CALLBACK(on_file_delete_button_clicked), widgets);
+    gtk_grid_attach(GTK_GRID(grid), widgets -> file2_delete_button, 0, 5, 2, 1);
 
     // Detect button for files 1 and 2
-    detect_button = gtk_button_new_with_label("Detect Plagiarism");
-    g_signal_connect(detect_button, "clicked", G_CALLBACK(on_detect_button_clicked), user_data);
-    gtk_grid_attach(GTK_GRID(grid), detect_button, 0, 6, 2, 1);
+    widgets -> detect_button = gtk_button_new_with_label("Detect Plagiarism");
+    g_signal_connect(widgets -> detect_button, "clicked", G_CALLBACK(on_detect_button_clicked), widgets);
+    gtk_grid_attach(GTK_GRID(grid), widgets -> detect_button, 0, 6, 2, 1);
 
     /*Label showing plagiarism extent*/
-    plagiarism_value_displayer = gtk_label_new("No files checked for plagiarism");
-    gtk_grid_attach(GTK_GRID(grid), plagiarism_value_displayer, 0, 7, 2, 1);
+    widgets -> plagiarism_value_displayer = gtk_label_new("No files checked for plagiarism");
+    gtk_grid_attach(GTK_GRID(grid), widgets -> plagiarism_value_displayer, 0, 7, 2, 1);
 
     gtk_widget_show_all(window);
 }
@@ -139,10 +148,10 @@ void activate(GtkApplication *app, gpointer user_data) {
 int main(int argc, char **argv) {
     GtkApplication *app;
     int status;
-    float plagiarismValue;
+    widget_data widgets = {0};
 
-    app = gtk_application_new("com.gmail.rotihaor.plagiarismdetector", G_APPLICATION_FLAGS_NONE);
-    g_signal_connect(app, "activate", G_CALLBACK(activate), &plagiarismValue);
+    app = gtk_application_new("com.gmail.rotihaor.plagiarismdetector", G_APPLICATION_DEFAULT_FLAGS);
+    g_signal_connect(app, "activate", G_CALLBACK(activate), &widgets);
     status = g_application_run(G_APPLICATION(app), argc, argv);
     g_object_unref(app);
 

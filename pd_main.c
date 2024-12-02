@@ -12,7 +12,7 @@
  * providing sufficient gains.
  */
 
-float pd_main(char *argv[]) {
+float pd_main_text_file(char **argv) {
 	wordQueue q1, q2;
 	FILE *f1 = fopen(argv[0], "r"), *f2 = fopen(argv[1], "r");
 	int /*i, */firstFileSize;
@@ -60,5 +60,6 @@ float pd_main(char *argv[]) {
 	}*/
 	fclose(f1);
 	fclose(f2);
+	printf("reached\n");
 	return plagiarismPercentage;
 }

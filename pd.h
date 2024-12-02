@@ -29,10 +29,7 @@ typedef struct hashTableHead{
 	hashNode *head;
 }hashTableHead;
 
-typedef struct {
-	float *value;
-	
-}widget_data;
+
 void enqueue(wordQueue *q, char *word);
 int checkCommon(char *word);
 void initQueue(wordQueue *q);
@@ -52,4 +49,4 @@ char *tokenizeWord(char *, int);
 void freeHashTable(hashTableHead *);
 void freeQueue(wordQueue *);
 void freeIndices(indexQueue *);
-float pd_main(char **);
+float pd_main_text_file(char **);
