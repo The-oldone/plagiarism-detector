@@ -3,7 +3,6 @@
 #include"pd.h"
 #include<string.h>
 
-
 /**
  * we can't not store the second file in a queue, because, we scan one word, then to check more words
  * we scan more words from the second file and the queue, then those words can't be checked again
@@ -11,7 +10,7 @@
  * providing sufficient gains.
  */
 
-float pd_main_text_file(char **argv) {
+float pd_main_text_file(char **argv, int wordsInRowThreshold) {
 	wordQueue q1, q2;
 	FILE *f1 = fopen(argv[0], "r"), *f2 = fopen(argv[1], "r");
 	int /*i, */firstFileSize;
@@ -41,7 +40,7 @@ float pd_main_text_file(char **argv) {
 			printf("\n");
 		}
 	}*/
-	plagiarismValue = checkPlagiarism(&q1, &q2, hashTable, firstFileSize);
+	plagiarismValue = checkPlagiarism(&q1, &q2, hashTable, firstFileSize, wordsInRowThreshold);
 	plagiarismPercentage = plagiarismValue * 100;
 	printf("%.2f%%\n", plagiarismPercentage);
 	freeHashTable(hashTable);

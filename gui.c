@@ -2,16 +2,13 @@
 #include <stdio.h>
 #include"pd.h"
 
-/**make all gtk widgets as local variables and pass a struct
- * add functionality to display the percentage for both files
- * add functionality to work for docx and pdf files
-*/
 typedef struct {
     GtkWidget *file1_label, *file2_label;
     GtkWidget *file1_button, *file2_button;
     GtkWidget *file1_delete_button, *file2_delete_button;
     GtkWidget *detect_button;
     GtkWidget *plagiarism_value_displayer;
+    GtkWidget *wordsInARowThreshold;
 }widget_data;
 
 // Function to open file dialog
@@ -60,17 +57,17 @@ void on_detect_button_clicked(GtkWidget *button, gpointer user_data) {
     }
     float plagiarism_value_file_1, plagiarism_value_file_2;
     gchar *plagiarism_value_file_1_as_string, *plagiarism_value_file_2_as_string;
-
+    gint wordsInARowValue = gtk_spin_button_get_value_as_int((GtkSpinButton *) widgets -> wordsInARowThreshold);
     char **file_names = (char **) malloc (sizeof(char *) * 2);
     file_names[0] = (char *)file1_text;
     file_names[1] = (char *)file2_text;
 
-    plagiarism_value_file_1 = pd_main_text_file(file_names);
+    plagiarism_value_file_1 = pd_main_text_file(file_names, wordsInARowValue);
 
     file_names[0] = (char *)file2_text;
     file_names[1] = (char *)file1_text;
 
-    plagiarism_value_file_2 = pd_main_text_file(file_names);
+    plagiarism_value_file_2 = pd_main_text_file(file_names, wordsInARowValue);
 
     free(file_names);
     gchar *final_message = (gchar *) malloc(strlen("Plagiarism extent of file 1: 12345%%\nPlagiarism extent of file 2: 12345%%") * sizeof(char));
@@ -139,7 +136,12 @@ void activate(GtkApplication *app, gpointer user_data) {
 
     /*Label showing plagiarism extent*/
     widgets -> plagiarism_value_displayer = gtk_label_new("No files checked for plagiarism");
-    gtk_grid_attach(GTK_GRID(grid), widgets -> plagiarism_value_displayer, 0, 7, 2, 1);
+    gtk_grid_attach(GTK_GRID(grid), widgets -> plagiarism_value_displayer, 0, 8, 2, 1);
+
+    GtkAdjustment *adjustment;
+    adjustment = gtk_adjustment_new(1.0, 0.0, 1000.0, 1.0, 5.0, 0.0);
+    widgets -> wordsInARowThreshold = gtk_spin_button_new(adjustment, 1.0, 0);
+    gtk_grid_attach(GTK_GRID(grid), widgets -> wordsInARowThreshold, 0, 7, 2, 1);
 
     gtk_widget_show_all(window);
 }

@@ -37,9 +37,9 @@ indexQueue *hashTableSearch(hashTableHead *h, char *word);
 void hashTableInsert(hashTableHead *h, char *word, int index);
 void readFile(wordQueue *q, FILE *file, hashTableHead *hashTable, int *fileSize, int);
 char *dequeue(wordQueue *q);
-float checkPlagiarism(wordQueue *, wordQueue *, hashTableHead *, int);
+float checkPlagiarism(wordQueue *, wordQueue *, hashTableHead *, int, int);
 int isEmpty(wordQueue *);
-int traverseTillDissimilar(wordQueue *, wordQueue *, int index);/*to be done*/
+int traverseTillDissimilar(wordQueue *, wordQueue *, int index);
 void initIndices(indexQueue *indices);
 int generateHashValue(char *word);
 void indexPush(indexQueue *, int);
@@ -49,6 +49,6 @@ char *tokenizeWord(char *, int);
 void freeHashTable(hashTableHead *);
 void freeQueue(wordQueue *);
 void freeIndices(indexQueue *);
-float pd_main_text_file(char **);
+float pd_main_text_file(char **, int);
 
 #define HASHSIZE 1001

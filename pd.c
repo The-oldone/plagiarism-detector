@@ -198,11 +198,15 @@ int traverseTillDissimilar(wordQueue *file1, wordQueue *file2, int destinationIn
 	return count;
 }
 
-float checkPlagiarism(wordQueue *file1, wordQueue *file2, hashTableHead *hashtable, int firstFileSize) {
+float checkPlagiarism(wordQueue *file1,
+		wordQueue *file2,
+		hashTableHead *hashtable,
+		int firstFileSize,
+		int wordInRowThreshold) {
 	char *word;
 	indexNode *indicesCounter;
 	float plagiarismExtent;
-	int index, count, max = 0;
+	int index, count, max = 0, total = 0;
 	while(!isEmpty(file2)){
 		word = dequeue(file2);
 		if(!hashTableSearch(hashtable, word)) {
@@ -217,9 +221,11 @@ float checkPlagiarism(wordQueue *file1, wordQueue *file2, hashTableHead *hashtab
 			}
 			indicesCounter = indicesCounter -> next;
 		}
+		total += max;
+		max = 0;
 		free(word);
 	}
-	plagiarismExtent = (float) max / firstFileSize;
+	plagiarismExtent = (float) total / firstFileSize;
 	return plagiarismExtent;
 }
 
