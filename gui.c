@@ -8,7 +8,7 @@ typedef struct {
     GtkWidget *file1_delete_button, *file2_delete_button;
     GtkWidget *detect_button;
     GtkWidget *plagiarism_value_displayer;
-    GtkWidget *wordsInARowThreshold;
+    GtkWidget *wordsInARowThreshold, *wordsInARowThresholdLabel;
 }widget_data;
 
 // Function to open file dialog
@@ -70,8 +70,8 @@ void on_detect_button_clicked(GtkWidget *button, gpointer user_data) {
     plagiarism_value_file_2 = pd_main_text_file(file_names, wordsInARowValue);
 
     free(file_names);
-    gchar *final_message = (gchar *) malloc(strlen("Plagiarism extent of file 1: 12345%%\nPlagiarism extent of file 2: 12345%%") * sizeof(char));
-    snprintf(final_message, 99, "Plagiarism extent of file 1: %.2f%%\nPlagiarism extent of file 2: %.2f%%", plagiarism_value_file_1, plagiarism_value_file_2);
+    gchar *final_message = (gchar *) malloc((strlen("Plagiarism extent of : 12345%%\nPlagiarism extent of : 12345%%") + 512)* sizeof(char));
+    snprintf(final_message, 600, "Plagiarism extent of %s: %.2f%%\nPlagiarism extent of %s: %.2f%%", gtk_label_get_text(GTK_LABEL(widgets -> file1_label)), plagiarism_value_file_1, gtk_label_get_text(GTK_LABEL(widgets -> file2_label)), plagiarism_value_file_2);
     gtk_label_set_text(GTK_LABEL(widgets -> plagiarism_value_displayer), final_message);
     free(final_message);
     return;
@@ -134,14 +134,18 @@ void activate(GtkApplication *app, gpointer user_data) {
     g_signal_connect(widgets -> detect_button, "clicked", G_CALLBACK(on_detect_button_clicked), widgets);
     gtk_grid_attach(GTK_GRID(grid), widgets -> detect_button, 0, 6, 2, 1);
 
-    /*Label showing plagiarism extent*/
-    widgets -> plagiarism_value_displayer = gtk_label_new("No files checked for plagiarism");
-    gtk_grid_attach(GTK_GRID(grid), widgets -> plagiarism_value_displayer, 0, 8, 2, 1);
+    widgets -> wordsInARowThresholdLabel = gtk_label_new("Specify minimum words in a row to be\nconsidered for checking");
+    gtk_grid_attach(GTK_GRID(grid), widgets -> wordsInARowThresholdLabel, 0, 7, 2, 1);
 
     GtkAdjustment *adjustment;
     adjustment = gtk_adjustment_new(1.0, 0.0, 1000.0, 1.0, 5.0, 0.0);
     widgets -> wordsInARowThreshold = gtk_spin_button_new(adjustment, 1.0, 0);
-    gtk_grid_attach(GTK_GRID(grid), widgets -> wordsInARowThreshold, 0, 7, 2, 1);
+    gtk_grid_attach(GTK_GRID(grid), widgets -> wordsInARowThreshold, 0, 8, 2, 1);
+
+    /*Label showing plagiarism extent*/
+    widgets -> plagiarism_value_displayer = gtk_label_new("No files checked for plagiarism");
+    gtk_grid_attach(GTK_GRID(grid), widgets -> plagiarism_value_displayer, 0, 9, 2, 1);
+
 
     gtk_widget_show_all(window);
 }

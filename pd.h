@@ -2,6 +2,7 @@
 typedef struct wordNode{
 	struct wordNode *next;
 	char word[32];
+	int visited;
 }wordNode;
 
 typedef struct wordQueue {
@@ -51,4 +52,4 @@ void freeQueue(wordQueue *);
 void freeIndices(indexQueue *);
 float pd_main_text_file(char **, int);
 
-#define HASHSIZE 1001
+#define HASHSIZE 101
