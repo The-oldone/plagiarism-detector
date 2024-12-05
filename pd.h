@@ -31,7 +31,7 @@ typedef struct hashTableHead{
 }hashTableHead;
 
 
-void enqueue(wordQueue *q, char *word);
+void enqueueWord(wordQueue *q, char *word);
 int checkCommon(char *word);
 void initQueue(wordQueue *q);
 indexQueue *hashTableSearch(hashTableHead *h, char *word);
