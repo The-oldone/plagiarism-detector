@@ -146,7 +146,6 @@ void activate(GtkApplication *app, gpointer user_data) {
     widgets -> plagiarism_value_displayer = gtk_label_new("No files checked for plagiarism");
     gtk_grid_attach(GTK_GRID(grid), widgets -> plagiarism_value_displayer, 0, 9, 2, 1);
 
-
     gtk_widget_show_all(window);
 }
 
