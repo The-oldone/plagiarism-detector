@@ -9,6 +9,7 @@ typedef struct {
     GtkWidget *detect_button;
     GtkWidget *plagiarism_value_displayer;
     GtkWidget *wordsInARowThreshold, *wordsInARowThresholdLabel;
+    GtkWidget *historyHolders[5];
 }widget_data;
 
 // Function to open file dialog
@@ -37,7 +38,7 @@ void on_file_button_clicked(GtkWidget *button, gpointer user_data) {
     gtk_widget_destroy(dialog);
 }
 
-// Function to delete file 1
+/* Function to delete file 1*/
 void on_file_delete_button_clicked(GtkWidget *button, gpointer file_data) {
     widget_data *widgets = (widget_data *) file_data;
     /*checks which file delete button is activated*/
@@ -47,6 +48,28 @@ void on_file_delete_button_clicked(GtkWidget *button, gpointer file_data) {
     }
     gtk_label_set_text(GTK_LABEL(widgets -> file2_label), "No file selected");
     return;
+}
+void assign_to_labels(gchar *final_message, gpointer widget_set) {
+    widget_data *widgets = (widget_data *) widget_set;
+    int i;
+    /* Process no files checked yet*/
+    if(strcmp(gtk_label_get_text(GTK_LABEL(widgets -> historyHolders[0])), "No files checked for plagiarism") == 0){
+        gtk_label_set_text(GTK_LABEL(widgets -> historyHolders[0]), final_message);
+        return;
+    }
+    GtkWidget **notNullValidifier = widgets -> historyHolders;
+    /*reach next null value*/
+    for(i = 1; i < 5 && *gtk_label_get_text(GTK_LABEL(notNullValidifier[i])); i++){
+    }
+    /*If last is empty, we get overflow, fix it*/
+    if(i == 5) {
+        i = 4;
+    }
+    /*shift all labels down by 1 and add new */
+    for(; i > 0; i--) {
+        gtk_label_set_text(GTK_LABEL(notNullValidifier[i]), gtk_label_get_text((GTK_LABEL(notNullValidifier[i - 1]))));
+    }
+    gtk_label_set_text(GTK_LABEL(widgets -> historyHolders[0]), final_message);
 }
 
 // Function to handle detection logic for files 1 and 2
@@ -83,6 +106,7 @@ void on_detect_button_clicked(GtkWidget *button, gpointer user_data) {
     /*assignes formatted string*/
     snprintf(final_message, 600, "Plagiarism extent of %s: %.2f%%\nPlagiarism extent of %s: %.2f%%", gtk_label_get_text(GTK_LABEL(widgets -> file1_label)), plagiarism_value_file_1, gtk_label_get_text(GTK_LABEL(widgets -> file2_label)), plagiarism_value_file_2);
     gtk_label_set_text(GTK_LABEL(widgets -> plagiarism_value_displayer), final_message);
+    assign_to_labels(final_message, (gpointer)widgets);
     free(final_message);
     return;
 }
@@ -166,6 +190,21 @@ void activate(GtkApplication *app, gpointer user_data) {
     /*Label showing plagiarism extent*/
     widgets -> plagiarism_value_displayer = gtk_label_new("No files checked for plagiarism");
     gtk_grid_attach(GTK_GRID(grid), widgets -> plagiarism_value_displayer, 0, 9, 2, 1);
+
+    widgets -> historyHolders[0] = gtk_label_new("No files checked for plagiarism");
+    gtk_grid_attach(GTK_GRID(grid), widgets -> historyHolders[0], 2, 2, 1, 1);
+
+    widgets -> historyHolders[1] = gtk_label_new("");
+    gtk_grid_attach(GTK_GRID(grid), widgets -> historyHolders[1], 2, 3, 1, 1);
+
+    widgets -> historyHolders[2] = gtk_label_new("");
+    gtk_grid_attach(GTK_GRID(grid), widgets -> historyHolders[2], 2, 4, 1, 1);
+
+    widgets -> historyHolders[3] = gtk_label_new("");
+    gtk_grid_attach(GTK_GRID(grid), widgets -> historyHolders[3], 2, 5, 1, 1);
+
+    widgets -> historyHolders[4] = gtk_label_new("");
+    gtk_grid_attach(GTK_GRID(grid), widgets -> historyHolders[4], 2, 6, 1, 1);
 
     gtk_widget_show_all(window);
 }
